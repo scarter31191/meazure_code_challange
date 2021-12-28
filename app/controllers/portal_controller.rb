@@ -6,9 +6,10 @@ class PortalController < ApplicationController
     # * an exam exists and belongs to the college (exam_id) **done (needs error handle)**
     # * a user is successfully found or created, and assigned to the exam **done (needs error handle)**
     # * the start_time of the request falls within an Exam's time window
-    before_action :set_student, :set_college, :set_exam, :valid_exam?, :student_exam
+    before_action :set_student, :set_college, :set_exam, :valid_exam?, :student_exam, :set_exam_window
 
     def set_student
+        # finds or creates a user
         @student = Student.find_or_create_by(first_name: params[:first_name], last_name: params[:last_name], phone_number: params[:phone_number])
 
         unless @student
@@ -19,6 +20,7 @@ class PortalController < ApplicationController
     
 
     def set_college
+        # finds a college
         @college = College.find(params[:college_id])
         # byebug
         unless @college
@@ -27,6 +29,7 @@ class PortalController < ApplicationController
     end
 
     def set_exam
+        # finds exam
         @exam = Exam.find(params[:exam_id])
 
         unless @exam
@@ -35,25 +38,33 @@ class PortalController < ApplicationController
     end
 
     def valid_exam?
+        # checks if exam belongs_to college
         @exam.college == @college
     end
 
     def student_exam
+        # checks if student is included in the exam
         if @exam.students.exclude?(@student)
             render json: {message: "Student not found"}
         end
+        # byebug
     end
 
     def set_exam_window
+        # finds exam
         @exam_window = ExamWindow.find(params[:exam_id])
+        byebug
     end
 
     def start_exam
-        if @exam_window.start_time <= Time.now.to_datetime
+        # checks to see if exam has begun or not
+        byebug
+        if @exam_window.start_time >= Time.now.to_datetime
             render json: {message: "Testing has not begun"}
         else 
             render json: {message: "Testing has begun"}
         end
+        byebug
     end
 
     # def start_exam
