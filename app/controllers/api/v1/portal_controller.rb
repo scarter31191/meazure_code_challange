@@ -1,13 +1,7 @@
 module Api
     module V1
         class PortalController < ApplicationController
-            # ::API
-            # * A successful (200 OK) response if:
-            # * the request data is valid and sanitized
-            # * a college exists in the database (college_id) **done (needs error handle)**
-            # * an exam exists and belongs to the college (exam_id) **done (needs error handle)**
-            # * a user is successfully found or created, and assigned to the exam **done (needs error handle)**
-            # * the start_time of the request falls within an Exam's time window
+            
             before_action :set_student, :set_college, :set_exam, :valid_exam?, :student_exam
             
         
