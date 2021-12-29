@@ -6,7 +6,8 @@ class PortalController < ApplicationController
     # * an exam exists and belongs to the college (exam_id) **done (needs error handle)**
     # * a user is successfully found or created, and assigned to the exam **done (needs error handle)**
     # * the start_time of the request falls within an Exam's time window
-    before_action :set_student, :set_college, :set_exam, :valid_exam?, :student_exam, :set_exam_window
+    before_action :set_student, :set_college, :set_exam, :valid_exam?, :student_exam
+    
 
     def set_student
         # finds or creates a user
@@ -17,11 +18,10 @@ class PortalController < ApplicationController
         end
     end
 
-    
 
     def set_college
         # finds a college
-        @college = College.find(params[:college_id])
+        @college = College.find_by_id(params[:college_id])
         unless @college
             render json: {message: "No college found"}
         end
@@ -29,9 +29,9 @@ class PortalController < ApplicationController
 
     def set_exam
         # finds exam
-        @exam = Exam.find(params[:exam_id])
-
-        unless @exam
+        @exam = Exam.find_by_id(params[:exam_id])
+        
+        if @exam.nil?
             render json: {message: "No exam found"}
         end
     end
@@ -40,33 +40,28 @@ class PortalController < ApplicationController
         # checks if exam belongs_to college
         @exam.college == @college
         
+        if @exam.college != @college
+            render json: {message: "Exam does not belong to this college"}
+        end
     end
 
     def student_exam
         # checks if student is included in the exam
+
         if @exam.students.exclude?(@student)
             render json: {message: "Student not found"}
         end
-        # byebug
-    end
-
-    def set_exam_window
-        # finds exam
-        @exam_window = ExamWindow.find(params[:exam_id])
-
     end
 
     def start_exam
         # checks to see if exam has begun or not
+        @exam_window = ExamWindow.find(params[:exam_id])
+        
         if @exam_window.start_time >= Time.now.to_datetime
             render json: {message: "Testing has not begun"}
         else 
             render json: {message: "Testing has begun"}
         end
     end
-
-    # def start_exam
-    #     render json: @exam.college
-    # end
 
 end
