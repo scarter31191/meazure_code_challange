@@ -22,7 +22,6 @@ class PortalController < ApplicationController
     def set_college
         # finds a college
         @college = College.find(params[:college_id])
-        # byebug
         unless @college
             render json: {message: "No college found"}
         end
@@ -40,6 +39,7 @@ class PortalController < ApplicationController
     def valid_exam?
         # checks if exam belongs_to college
         @exam.college == @college
+        
     end
 
     def student_exam
@@ -53,18 +53,16 @@ class PortalController < ApplicationController
     def set_exam_window
         # finds exam
         @exam_window = ExamWindow.find(params[:exam_id])
-        byebug
+
     end
 
     def start_exam
         # checks to see if exam has begun or not
-        byebug
         if @exam_window.start_time >= Time.now.to_datetime
             render json: {message: "Testing has not begun"}
         else 
             render json: {message: "Testing has begun"}
         end
-        byebug
     end
 
     # def start_exam
